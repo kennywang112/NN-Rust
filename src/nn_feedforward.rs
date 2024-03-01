@@ -1,39 +1,42 @@
-use nalgebra::DMatrix;
-
+use rand::prelude::*;
 use crate::activation_function::sigmoid;
-use crate::matrix_function::random_matrix;
 
 pub fn feedforward() {
 
-    // 初始化參數
+    // Parameters
     let input_size: usize = 2;
     let hidden_size: usize = 3;
     let output_size: usize = 1;
+    // Weights
+    let weights_input_hidden = vec![vec![0.0; hidden_size]; input_size];
+    let weights_hidden_output = vec![vec![0.0; output_size]; hidden_size];
+    // Bias
+    let bias_hidden = rand::thread_rng().gen_range(-1.0..1.0);
+    let bias_output = rand::thread_rng().gen_range(-1.0..1.0);
 
-    // 生成並初始化權重矩陣
-    // (2, 3)
-    let weights_input_hidden = random_matrix(input_size, hidden_size, -1.0, 1.0);
-    // (3, 1)
-    let weights_hidden_output = random_matrix(hidden_size, output_size, -1.0, 1.0);
+    println!("{:?}", weights_input_hidden);
+    println!("{:?}", bias_hidden);
 
-    // 生成並初始化偏差矩陣
-    // (2, 3)
-    let bias_hidden = random_matrix(2, hidden_size, -1.0, 1.0);
-    // (2, 1)
-    let bias_output = random_matrix(2, output_size, -1.0, 1.0);
+    let input_data = vec![0.5, 0.8];
 
-    // 定義輸入數據
-    let input_data = DMatrix::from_row_slice(2, input_size, &[0.5, 0.8, 0.1, 0.2]);
+    // Feedforward
+    let mut hidden_layer_input = vec![0.0; hidden_size];
+    for i in 0..input_size {
+        for j in 0..hidden_size {
+            hidden_layer_input[j] += input_data[i] * weights_input_hidden[i][j];
+            println!("{:?}", hidden_layer_input[j])
+        }
+    }
+    let hidden_layer_output: Vec<f64> = hidden_layer_input.iter().map(|&x| sigmoid(x + bias_hidden)).collect();
 
-    // println!("input_data: \n{}", input_data);
+    let mut output_layer_input = vec![0.0; output_size];
+    for i in 0..hidden_size {
+        for j in 0..output_size {
+            output_layer_input[j] += hidden_layer_output[i] * weights_hidden_output[i][j];
+        }
+    }
+    let output_layer_output: Vec<f64> = output_layer_input.iter().map(|&x| sigmoid(x + bias_output)).collect();
 
-    // feedforward
-    // (2, 2) * (2, 3) + (2, 3) = (2, 3)
-    let hidden_layer_input = &input_data * &weights_input_hidden + &bias_hidden;
-    let hidden_layer_output = hidden_layer_input.map(|x| sigmoid(x));
-    // println!("hidden_layer_output: \n{}", hidden_layer_output);
-    // (2, 3) * (3, 1) + (2, 1) = (2, 1)
-    let output_layer_input = &hidden_layer_output * &weights_hidden_output + &bias_output;
-    let _output_layer_output = output_layer_input.map(|x| sigmoid(x));
-    // println!("output_layer_output: \n{}", output_layer_output);
+    println!("Input: {:?}", input_data);
+    println!("Output: {:?}", output_layer_output);
 }

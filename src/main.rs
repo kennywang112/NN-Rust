@@ -13,7 +13,7 @@ use rnn::recurrent;
 fn main() {
 
     feedforward();
-    backpropogation();
-    recurrent();
+    // backpropogation();
+    // recurrent();
 
 }

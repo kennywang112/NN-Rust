@@ -35,6 +35,6 @@ pub fn recurrent() {
         // output_sequence.row_mut(i).assign(&output_t);
         state_t = output_t.clone();
         
-        println!("state: {:?}", state_t);
+        // println!("state: {:?}", state_t);
     }
 }
